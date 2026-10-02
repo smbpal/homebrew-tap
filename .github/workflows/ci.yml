@@ -20,9 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-
+      # No setup-homebrew action: the macOS runner image ships Homebrew, and
+      # `Homebrew/actions/setup-homebrew@master` does not resolve — the first run
+      # of this workflow failed on exactly that, in 14 seconds.
       - name: Tap this checkout
         run: brew tap smbpal/tap "$GITHUB_WORKSPACE"
 
