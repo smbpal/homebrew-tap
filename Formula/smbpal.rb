@@ -124,15 +124,29 @@ class Smbpal < Formula
     refute_match "systemctl", output
 
     # The toolkit the two heaviest dependencies are here for. Importing it from
-    # the installed virtualenv is the only check that `system_site_packages`
-    # did its job; everything else above is standard library.
+    # the installed virtualenv is the only check that `system_site_packages` did
+    # its job; everything above is standard library.
+    #
+    # **It stops short of `from gi.repository import Gtk`, and that is not
+    # timidity.** PyGObject's Gtk override calls `gtk_init_check()` at import,
+    # which on macOS opens a GDK display, which registers the process with the
+    # window server — and in a context that has no window server, such as this
+    # one, `HIServices _RegisterApplication` calls `abort()`. The process dies
+    # with `Abort trap: 6`, no Python exception and no message. Diagnosed from
+    # the crash report on 2 October 2026 after `shell_output` reported only
+    # "Expected: 0, Actual: nil".
+    #
+    # So this asserts exactly what the dependencies are here to provide: `gi`
+    # importable from the venv, and a Gtk 4.0 typelib for it to find.
     (testpath/"toolkit.py").write <<~PYTHON
       import gi
+
       gi.require_version("Gtk", "4.0")
-      from gi.repository import Gtk
-      print("gtk", Gtk.get_major_version())
+      from gi.repository import GLib
+
+      print("gi", gi.__version__, "glib", GLib.MAJOR_VERSION)
     PYTHON
-    assert_match "gtk 4",
-      shell_output("#{libexec}/bin/python #{testpath}/toolkit.py")
+    assert_match "glib 2",
+      shell_output("#{libexec}/bin/python #{testpath}/toolkit.py 2>&1")
   end
 end
