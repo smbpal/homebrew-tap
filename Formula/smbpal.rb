@@ -13,17 +13,11 @@ class Smbpal < Formula
 
   desc "Share folders over SMB, and connect to the ones other machines share"
   homepage "https://smbpal.app"
-  # **Pinned one release behind, knowingly, until v0.2.6 is tagged.** The v0.2.5
-  # tarball predates `smbpal-agent`: `brew install` against it puts four entry
-  # points on PATH and not the one `caveats` tells people to run, and v0.2.5 is
-  # also the version whose `smbpal ping` sends a Mac user to `systemctl`. Both
-  # are fixed on `main` and both are in 0.2.6. The `test do` block below asserts
-  # the 0.2.6 behaviour and therefore **fails against this tarball**, which is
-  # the state this comment exists to make deliberate rather than mysterious —
-  # `brew install --HEAD` is what works today. Three lines move together when
-  # the tag lands: this url, the sha256 under it, and nothing else.
-  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.5.tar.gz"
-  sha256 "47597fd7c430ba729ffee92a190f5d8978500d093e845b85b62465adf30f3e6e"
+  # The tag must contain `smbpal-agent`, which is what `caveats` tells people to
+  # run and what v0.2.5's tarball did not have — the `test do` block below is
+  # what caught that, and it is why the url and the test move together.
+  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.6.tar.gz"
+  sha256 "692ba27bc0d1cf29876a113dbca0849d0ba985e954e5ff2930a89dc68737b54a"
   license "GPL-3.0-or-later"
   head "https://github.com/smbpal/smbpal-desktop.git", branch: "main"
 
