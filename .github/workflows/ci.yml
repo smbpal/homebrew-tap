@@ -2,10 +2,12 @@
 # an interpreter, two libraries and four entry points, and any of them can move
 # without this repository changing at all.
 #
-# One job, on one runner, deliberately. macOS minutes bill at ten times the
-# Linux rate on a private repository, and `brew style` and `brew audit` need a
-# Homebrew that can resolve the dependencies — which is a macOS Homebrew, since
-# the formula declares `depends_on :macos`.
+# One job, on one runner, deliberately — and now for the second of two reasons
+# rather than the first. The repository went public on 2 October 2026, which
+# makes Actions minutes free and retires the ten-times-Linux macOS rate that
+# first argued for one job. What still holds: `brew style` and `brew audit` need
+# a Homebrew that can resolve the dependencies, which is a macOS Homebrew, since
+# the formula declares `depends_on :macos`. A second runner would buy nothing.
 name: CI
 
 on:
