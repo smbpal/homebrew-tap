@@ -1,0 +1,56 @@
+# A tap whose formula is never installed is a tap that rots: the formula names
+# an interpreter, two libraries and four entry points, and any of them can move
+# without this repository changing at all.
+#
+# One job, on one runner, deliberately. macOS minutes bill at ten times the
+# Linux rate on a private repository, and `brew style` and `brew audit` need a
+# Homebrew that can resolve the dependencies — which is a macOS Homebrew, since
+# the formula declares `depends_on :macos`.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  formula:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Tap this checkout
+        run: brew tap smbpal/tap "$GITHUB_WORKSPACE"
+
+      - name: brew style
+        run: brew style smbpal/tap
+
+      # --online checks the url, the homepage and the licence against SPDX;
+      # --strict is what homebrew-core holds its own formulae to.
+      - name: brew audit
+        run: brew audit --strict --online smbpal/tap/smbpal
+
+      # HEAD rather than the stable tarball: the point is that the formula still
+      # builds what the project is now, and a stable bottle would tell us only
+      # that an old tarball still unpacks. --build-from-source because there are
+      # no bottles for this tap and never will be while it carries one formula.
+      - name: brew install --HEAD
+        run: brew install --HEAD --build-from-source smbpal/tap/smbpal
+
+      - name: brew test
+        run: brew test --verbose smbpal
+
+      # Not ceremony: `audit` has no opinion about what `caveats` claims, and the
+      # caveats name a command. A formula that installs and then tells somebody
+      # to run something it did not install is the failure this repository is
+      # most likely to ship.
+      - name: Every command the caveats name exists
+        run: |
+          for command in smbpal smbpald smbpal-agent; do
+            command -v "$command" || { echo "missing: $command"; exit 1; }
+          done
+          smbpal-agent --check

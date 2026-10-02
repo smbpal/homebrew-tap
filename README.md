@@ -7,6 +7,18 @@ brew tap smbpal/tap
 brew install smbpal
 ```
 
+**The stable pin is one release behind on purpose.** `brew install smbpal`
+fetches v0.2.5, whose tarball predates `smbpal-agent` — so until v0.2.6 is
+tagged, use:
+
+```sh
+brew install --HEAD smbpal
+```
+
+The formula says the same thing in a comment above its `url`, and its `test do`
+block fails against the stable tarball rather than passing quietly. That is
+what caught the mismatch in the first place.
+
 **macOS support is in progress.** What installs today is the client half — browse
 the network, mount a share, and the per-user agent that does the mounting
 (`smbpal-agent --install`). Serving shares needs a privileged helper that is not
