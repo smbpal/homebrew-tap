@@ -4,8 +4,21 @@ The Homebrew tap for [SMBPal](https://smbpal.app).
 
 ```sh
 brew tap smbpal/tap
+brew trust smbpal/tap
 brew install smbpal
 ```
+
+**Three steps, and the second is not optional.** Homebrew 6 refuses to load a
+formula from a third-party tap until you say you trust it — *Refusing to load
+formula smbpal/tap/smbpal from untrusted tap smbpal/tap* — and nothing this
+repository can do grants that, because the whole point is that the decision is
+yours and not ours. `brew trust --formula smbpal/tap/smbpal` is the narrower
+form if you would rather trust this one formula than the tap.
+
+Unlike the `.deb`'s group step, skipping this one is not quiet: Homebrew names
+the command that fixes it. It is written here anyway, because an install that
+stops with an error on step two reads as a broken tap rather than a deliberate
+gate.
 
 **macOS support is in progress.** What installs today is the client half — browse
 the network, mount a share, and the per-user agent that does the mounting
