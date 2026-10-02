@@ -89,8 +89,20 @@ class Smbpal < Formula
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/smbpal --version")
-    assert_match version.to_s, shell_output("#{bin}/smbpald --version")
+    # The licence notice travels with the binary because GPLv3 §6(d) lets a
+    # public repository stand in for a source tarball only if the directions to
+    # it go with the object code, so it is an invariant rather than decoration.
+    banner = shell_output("#{bin}/smbpal --version")
+    assert_match "GPL-3.0-or-later", banner
+    assert_match "github.com/smbpal/smbpal-desktop", banner
+    # On a `--HEAD` build `version` is "HEAD-<sha>" while the program keeps
+    # reporting the number in `pyproject.toml`, so these two only have to agree
+    # on a release. Found by running `brew test` against HEAD rather than by
+    # reading about it.
+    unless head?
+      assert_match version.to_s, banner
+      assert_match version.to_s, shell_output("#{bin}/smbpald --version")
+    end
 
     # The platform check, which is the agent's own answer rather than ours.
     assert_equal "supported", shell_output("#{bin}/smbpal-agent --check").strip
