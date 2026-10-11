@@ -16,8 +16,8 @@ class Smbpal < Formula
   # The tag must contain `smbpal-agent`, which is what `caveats` tells people to
   # run and what v0.2.5's tarball did not have — the `test do` block below is
   # what caught that, and it is why the url and the test move together.
-  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.10.tar.gz"
-  sha256 "61d52ff76f8a1d259ce1f7aa9aa1c6334054a2790a3fa112e2f36be21dea1637"
+  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.11.tar.gz"
+  sha256 "3dd1d7a3039803d77ced69090182d4d5c89b298392e6b58d1cf474cf951cc90a"
   license "GPL-3.0-or-later"
   head "https://github.com/smbpal/smbpal-desktop.git", branch: "main"
 
