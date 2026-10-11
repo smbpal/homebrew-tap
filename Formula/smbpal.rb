@@ -16,8 +16,8 @@ class Smbpal < Formula
   # The tag must contain `smbpal-agent`, which is what `caveats` tells people to
   # run and what v0.2.5's tarball did not have — the `test do` block below is
   # what caught that, and it is why the url and the test move together.
-  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.9.tar.gz"
-  sha256 "bb620d43af399fc56e7794772c0d2e4d42471147254a7848525f76054630b69a"
+  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.10.tar.gz"
+  sha256 "61d52ff76f8a1d259ce1f7aa9aa1c6334054a2790a3fa112e2f36be21dea1637"
   license "GPL-3.0-or-later"
   head "https://github.com/smbpal/smbpal-desktop.git", branch: "main"
 
@@ -85,9 +85,21 @@ class Smbpal < Formula
       launchd keeps restarting what it has been given, so a plist left behind
       points at a program that is no longer there.
 
-      Serving shares is not ported yet: it needs a privileged helper, and
-      `smbpald` is a Linux service. The command line says so rather than
-      pretending.
+      To run the daemon, which keeps the configuration and answers `smbpal`:
+
+        smbpal setup
+
+      It prints the commands rather than running them, and nothing of SMBPal's
+      runs as root until the last one — by which point the thing being run as
+      root is a root-owned copy. Changing anything then asks for an
+      administrator password, through the same dialog the rest of the system
+      uses. After the install you need a new terminal: a shell keeps the groups
+      it started with.
+
+      **Serving a share is still not finished.** A share can be defined and the
+      daemon will keep it, but nothing yet tells macOS to serve it, so it will
+      not appear to other machines. Connecting to shares other machines serve
+      is the half that works.
     EOS
   end
 
