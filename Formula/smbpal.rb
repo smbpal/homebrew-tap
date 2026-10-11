@@ -16,8 +16,8 @@ class Smbpal < Formula
   # The tag must contain `smbpal-agent`, which is what `caveats` tells people to
   # run and what v0.2.5's tarball did not have — the `test do` block below is
   # what caught that, and it is why the url and the test move together.
-  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.9.tar.gz"
-  sha256 "bb620d43af399fc56e7794772c0d2e4d42471147254a7848525f76054630b69a"
+  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.10.tar.gz"
+  sha256 "61d52ff76f8a1d259ce1f7aa9aa1c6334054a2790a3fa112e2f36be21dea1637"
   license "GPL-3.0-or-later"
   head "https://github.com/smbpal/smbpal-desktop.git", branch: "main"
 
@@ -85,9 +85,21 @@ class Smbpal < Formula
       launchd keeps restarting what it has been given, so a plist left behind
       points at a program that is no longer there.
 
-      Serving shares is not ported yet: it needs a privileged helper, and
-      `smbpald` is a Linux service. The command line says so rather than
-      pretending.
+      To run the daemon, which keeps the configuration and answers `smbpal`:
+
+        smbpal setup
+
+      It prints the commands rather than running them, and nothing of SMBPal's
+      runs as root until the last one — by which point the thing being run as
+      root is a root-owned copy. Changing anything then asks for an
+      administrator password, through the same dialog the rest of the system
+      uses. After the install you need a new terminal: a shell keeps the groups
+      it started with.
+
+      **Serving a share is still not finished.** A share can be defined and the
+      daemon will keep it, but nothing yet tells macOS to serve it, so it will
+      not appear to other machines. Connecting to shares other machines serve
+      is the half that works.
     EOS
   end
 
@@ -116,12 +128,29 @@ class Smbpal < Formula
     assert_match "config is valid",
       shell_output("#{bin}/smbpald --check --config #{testpath}/config.json 2>&1")
 
-    # No daemon is listening and exit 3 is the documented code for that. The
-    # assertion is on what it tells a Mac user to do: `systemctl` would be a
-    # command this platform does not have.
+    # Exit 3 is the documented code for "could not reach the daemon", and both
+    # of the ways that happens take it: no socket at all, and a socket this user
+    # may not connect to.
+    #
+    # **It no longer asserts which of the two, and that was a real failure.**
+    # The test asserted "no SMBPal daemon", which was an invariant only while
+    # macOS could not run one. 0.2.10 makes installing the daemon a documented
+    # step, so on any Mac where `smbpal setup` has been run the message is
+    # "not allowed to connect" instead, and the test failed on a machine that
+    # was working correctly. A test that depends on whether the person has
+    # installed the rest of the product is testing their machine.
+    #
+    # So it pins what is true either way, and both halves are former bugs:
     output = shell_output("#{bin}/smbpal ping 2>&1", 3)
-    assert_match "no SMBPal daemon", output
+    # The macOS socket path. `/run` cannot exist on the Signed System Volume,
+    # and 0.2.9 fixed a client that looked for it there anyway.
+    assert_match "/var/run/smbpal/smbpald.sock", output
+    # The advice has to be runnable on this platform. `systemctl` is not a
+    # command macOS has -- and `usermod` is not either, which 0.2.9 told people
+    # to run and 0.2.10 fixed to `dscl`. One of these is a regression test for
+    # a sentence that shipped.
     refute_match "systemctl", output
+    refute_match "usermod", output
 
     # The toolkit the two heaviest dependencies are here for. Importing it from
     # the installed virtualenv is the only check that `system_site_packages` did
