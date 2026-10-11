@@ -96,10 +96,12 @@ class Smbpal < Formula
       uses. After the install you need a new terminal: a shell keeps the groups
       it started with.
 
-      **Serving a share is still not finished.** A share can be defined and the
-      daemon will keep it, but nothing yet tells macOS to serve it, so it will
-      not appear to other machines. Connecting to shares other machines serve
-      is the half that works.
+      **Sharing your own folders does not work yet.** Not partly: `smbpal share
+      add` fails. Being in SMBPal's configuration means being served -- a saved
+      share the daemon has not applied would be a lie about what the machine is
+      doing -- and nothing on macOS serves one yet, so there is no half-state to
+      save. Connecting to shares other machines serve is the half that works,
+      and it works fully.
     EOS
   end
 
