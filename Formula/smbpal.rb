@@ -112,12 +112,16 @@ class Smbpal < Formula
 
       Upgrading from 0.2.11 with the daemon installed? The helper is a separate,
       root-owned binary that `brew upgrade` does not touch. From a checkout of
-      this release's source:
+      this release's source, build it as yourself and install it as root:
 
-        sudo make -C helper install
+        make -C helper && sudo make -C helper install
 
       That also re-registers it with launchd; replacing the binary by hand
-      leaves the new helper unable to start.
+      leaves the new helper unable to start. If it ends in "Bootstrap failed:
+      5: Input/output error", launchd had not finished with the old helper and
+      none is loaded -- run this again until it takes:
+
+        sudo launchctl bootstrap system /Library/LaunchDaemons/app.smbpal.helper.plist
     EOS
   end
 
