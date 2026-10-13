@@ -16,8 +16,8 @@ class Smbpal < Formula
   # The tag must contain `smbpal-agent`, which is what `caveats` tells people to
   # run and what v0.2.5's tarball did not have — the `test do` block below is
   # what caught that, and it is why the url and the test move together.
-  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.11.tar.gz"
-  sha256 "3dd1d7a3039803d77ced69090182d4d5c89b298392e6b58d1cf474cf951cc90a"
+  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.12.tar.gz"
+  sha256 "e8480d603e15856a3504e68a9a387ccb4945f1b6e9bdc29b3c93c9dad0fcfee5"
   license "GPL-3.0-or-later"
   head "https://github.com/smbpal/smbpal-desktop.git", branch: "main"
 
@@ -68,7 +68,7 @@ class Smbpal < Formula
 
   def caveats
     <<~EOS
-      macOS support is in progress. What works today is the client half:
+      macOS support is in progress. Connecting to shares works fully:
 
         smbpal browse                 find machines sharing over SMB
         smbpal connection add ...     mount a share
@@ -96,12 +96,28 @@ class Smbpal < Formula
       uses. After the install you need a new terminal: a shell keeps the groups
       it started with.
 
-      **Sharing your own folders does not work yet.** Not partly: `smbpal share
-      add` fails. Being in SMBPal's configuration means being served -- a saved
-      share the daemon has not applied would be a lie about what the machine is
-      doing -- and nothing on macOS serves one yet, so there is no half-state to
-      save. Connecting to shares other machines serve is the half that works,
-      and it works fully.
+      Sharing your own folders works once the daemon is set up:
+
+        smbpal share add <name> <folder> [--user <account>]
+
+      The folder must be inside /Users or /Volumes, and a whole home folder is
+      refused -- share a folder inside it. Guest access is always off. File
+      Sharing has to be on in System Settings > General > Sharing, and turning
+      it on serves every shared folder on the Mac, not only SMBPal's.
+
+      Shares are served to accounts that already exist. On a Mac the SMB
+      password is the login password, so SMBPal does not set one: tick the
+      account under File Sharing > Options. `smbpal share make-writable <name>`
+      then lets that account write. Not yet: read-only shares.
+
+      Upgrading from 0.2.11 with the daemon installed? The helper is a separate,
+      root-owned binary that `brew upgrade` does not touch. From a checkout of
+      this release's source:
+
+        sudo make -C helper install
+
+      That also re-registers it with launchd; replacing the binary by hand
+      leaves the new helper unable to start.
     EOS
   end
 
