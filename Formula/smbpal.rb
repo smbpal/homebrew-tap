@@ -16,8 +16,8 @@ class Smbpal < Formula
   # The tag must contain `smbpal-agent`, which is what `caveats` tells people to
   # run and what v0.2.5's tarball did not have — the `test do` block below is
   # what caught that, and it is why the url and the test move together.
-  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.12.tar.gz"
-  sha256 "e8480d603e15856a3504e68a9a387ccb4945f1b6e9bdc29b3c93c9dad0fcfee5"
+  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.13.tar.gz"
+  sha256 "17518668e75d22993d87eb5f2944fffd97423a52dfb6952d33ec3ce25f4c1291"
   license "GPL-3.0-or-later"
   head "https://github.com/smbpal/smbpal-desktop.git", branch: "main"
 
@@ -110,18 +110,15 @@ class Smbpal < Formula
       account under File Sharing > Options. `smbpal share make-writable <name>`
       then lets that account write. Not yet: read-only shares.
 
-      Upgrading from 0.2.11 with the daemon installed? The helper is a separate,
-      root-owned binary that `brew upgrade` does not touch. From a checkout of
-      this release's source, build it as yourself and install it as root:
+      Upgrading with the daemon installed? The helper is a separate, root-owned
+      binary that `brew upgrade` does not touch. From a checkout of this
+      release's source, build it as yourself and install it as root:
 
         make -C helper && sudo make -C helper install
 
-      That also re-registers it with launchd; replacing the binary by hand
-      leaves the new helper unable to start. If it ends in "Bootstrap failed:
-      5: Input/output error", launchd had not finished with the old helper and
-      none is loaded -- run this again until it takes:
-
-        sudo launchctl bootstrap system /Library/LaunchDaemons/app.smbpal.helper.plist
+      That also re-registers it with launchd, waiting for launchd to finish
+      with the old one first; replacing the binary by hand leaves the new
+      helper unable to start.
     EOS
   end
 
