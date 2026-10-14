@@ -16,8 +16,8 @@ class Smbpal < Formula
   # The tag must contain `smbpal-agent`, which is what `caveats` tells people to
   # run and what v0.2.5's tarball did not have — the `test do` block below is
   # what caught that, and it is why the url and the test move together.
-  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.13.tar.gz"
-  sha256 "17518668e75d22993d87eb5f2944fffd97423a52dfb6952d33ec3ce25f4c1291"
+  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.14.tar.gz"
+  sha256 "9b3672c54f5e0283c3f05d2a8bba9d47942bb0b7584b17af5d1fe05f721f3260"
   license "GPL-3.0-or-later"
   head "https://github.com/smbpal/smbpal-desktop.git", branch: "main"
 
@@ -108,7 +108,8 @@ class Smbpal < Formula
       Shares are served to accounts that already exist. On a Mac the SMB
       password is the login password, so SMBPal does not set one: tick the
       account under File Sharing > Options. `smbpal share make-writable <name>`
-      then lets that account write. Not yet: read-only shares.
+      then lets that account write, and lets the folder's owner open what it
+      writes. Not yet: read-only shares.
 
       Upgrading with the daemon installed? The helper is a separate, root-owned
       binary that `brew upgrade` does not touch. From a checkout of this
