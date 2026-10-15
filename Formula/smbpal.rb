@@ -16,8 +16,8 @@ class Smbpal < Formula
   # The tag must contain `smbpal-agent`, which is what `caveats` tells people to
   # run and what v0.2.5's tarball did not have — the `test do` block below is
   # what caught that, and it is why the url and the test move together.
-  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.14.tar.gz"
-  sha256 "9b3672c54f5e0283c3f05d2a8bba9d47942bb0b7584b17af5d1fe05f721f3260"
+  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.15.tar.gz"
+  sha256 "cca3791a7a33002aae3b69e961e76d0299a1fc32ea89e94d7beb461a24c9362c"
   license "GPL-3.0-or-later"
   head "https://github.com/smbpal/smbpal-desktop.git", branch: "main"
 
@@ -110,6 +110,15 @@ class Smbpal < Formula
       account under File Sharing > Options. `smbpal share make-writable <name>`
       then lets that account write, and lets the folder's owner open what it
       writes. Not yet: read-only shares.
+
+      After `brew upgrade`, the daemon and the agent keep running the old
+      version until they restart:
+
+        sudo launchctl kickstart -k system/app.smbpal.daemon
+        smbpal-agent --install
+
+      The agent reconnects your shares at login, after sleep and when a server
+      comes back; a share you eject or disconnect stays disconnected.
 
       Upgrading with the daemon installed? The helper is a separate, root-owned
       binary that `brew upgrade` does not touch. From a checkout of this
