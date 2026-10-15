@@ -16,8 +16,8 @@ class Smbpal < Formula
   # The tag must contain `smbpal-agent`, which is what `caveats` tells people to
   # run and what v0.2.5's tarball did not have — the `test do` block below is
   # what caught that, and it is why the url and the test move together.
-  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.16.tar.gz"
-  sha256 "4250bf3073be60186303b1066bc88aee47a21894a72a0605bef14cd439a2de39"
+  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.17.tar.gz"
+  sha256 "bb5ba8ca44bf26af73be1c91a045e6d3ef5b2da21b6517d1bc81cb0fae47e03e"
   license "GPL-3.0-or-later"
   head "https://github.com/smbpal/smbpal-desktop.git", branch: "main"
 
@@ -109,7 +109,8 @@ class Smbpal < Formula
       password is the login password, so SMBPal does not set one: tick the
       account under File Sharing > Options. `smbpal share make-writable <name>`
       then lets that account write, and lets the folder's owner open what it
-      writes. Not yet: read-only shares.
+      writes. `smbpal share add <name> <folder> --read-only` shares a folder
+      other machines can read but not change.
 
       After `brew upgrade`, the daemon and the agent keep running the old
       version until they restart:
