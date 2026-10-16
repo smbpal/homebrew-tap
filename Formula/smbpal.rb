@@ -16,8 +16,8 @@ class Smbpal < Formula
   # The tag must contain `smbpal-agent`, which is what `caveats` tells people to
   # run and what v0.2.5's tarball did not have — the `test do` block below is
   # what caught that, and it is why the url and the test move together.
-  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.18.tar.gz"
-  sha256 "cacf21a036a3f46ad9a16fc0829ca8ed670fef2328f3ccebd3c2db7124454093"
+  url "https://github.com/smbpal/smbpal-desktop/archive/refs/tags/v0.2.19.tar.gz"
+  sha256 "43e1a7ec934e93d3bd5899745b20b22fd6c04fb26e898a4e544046bd0c60187e"
   license "GPL-3.0-or-later"
   head "https://github.com/smbpal/smbpal-desktop.git", branch: "main"
 
@@ -64,15 +64,32 @@ class Smbpal < Formula
     # `/opt/homebrew/bin/smbpal-agent` must keep that path rather than resolve
     # to a version-numbered one inside the Cellar.
     virtualenv_install_with_resources
+
+    # The root helper, compiled here so that installing with `brew` is enough.
+    # Until 0.2.19 the formula shipped none, and `smbpal setup` sent people to
+    # a source checkout to build one. It lands in the virtualenv's `helper/`,
+    # where `setup` looks, and nothing here runs it or makes it root's:
+    # `setup` prints the commands that copy it to a root-owned place, because
+    # root must never run admin-writable code (helper spike §0).
+    system "make", "-C", "helper", "smbpal-helper"
+    (libexec/"helper").install "helper/smbpal-helper"
   end
 
   def caveats
     <<~EOS
-      macOS support is in progress. Connecting to shares works fully:
+      Two steps finish the install. Set up the daemon, which keeps the
+      configuration and answers `smbpal`:
+
+        smbpal setup
+
+      and start the agent that does the mounting in your session:
+
+        smbpal-agent --install
+
+      Then:
 
         smbpal browse                 find machines sharing over SMB
         smbpal connection add ...     mount a share
-        smbpal-agent --install        start the agent that does the mounting
 
       The agent runs in your login session and not as root, because that is
       where the Keychain it reads lives, and because mounting on macOS needs no
@@ -85,11 +102,7 @@ class Smbpal < Formula
       launchd keeps restarting what it has been given, so a plist left behind
       points at a program that is no longer there.
 
-      To run the daemon, which keeps the configuration and answers `smbpal`:
-
-        smbpal setup
-
-      It prints the commands rather than running them, and nothing of SMBPal's
+      `smbpal setup` prints the commands rather than running them, and nothing of SMBPal's
       runs as root until the last one — by which point the thing being run as
       root is a root-owned copy. Changing anything then asks for an
       administrator password, through the same dialog the rest of the system
@@ -121,15 +134,10 @@ class Smbpal < Formula
       The agent reconnects your shares at login, after sleep and when a server
       comes back; a share you eject or disconnect stays disconnected.
 
-      Upgrading with the daemon installed? The helper is a separate, root-owned
-      binary that `brew upgrade` does not touch. From a checkout of this
-      release's source, build it as yourself and install it as root:
-
-        make -C helper && sudo make -C helper install
-
-      That also re-registers it with launchd, waiting for launchd to finish
-      with the old one first; replacing the binary by hand leaves the new
-      helper unable to start.
+      The helper is a separate, root-owned copy that `brew upgrade` does not
+      touch. After an upgrade, run `smbpal setup` again: when the installed
+      helper is out of date it prints the commands that replace it and
+      re-register it with launchd.
     EOS
   end
 
@@ -148,6 +156,10 @@ class Smbpal < Formula
       assert_match version.to_s, banner
       assert_match version.to_s, shell_output("#{bin}/smbpald --version")
     end
+
+    # The helper the formula builds, which `smbpal setup` installs from. Its
+    # absence is what sent Mac users to a source checkout before 0.2.19.
+    assert_predicate libexec/"helper/smbpal-helper", :executable?
 
     # The platform check, which is the agent's own answer rather than ours.
     assert_equal "supported", shell_output("#{bin}/smbpal-agent --check").strip
